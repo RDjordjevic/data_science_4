@@ -77,8 +77,7 @@ Growth_summary <- Growth_summary %>%
 )
 
                     
-**Designated place**: type one or two sentences describing this table of a fellow student below. For example, comment on the mean and median growth of both groups. Then stage, commit and push it to their github repository. 
-
+**Designated place** :Riccardo uses the function datasummary to fulfil the task above. He finds the mean, sd, median, max and min of the dataset Growth_summary. 
 
 ### Part 3: Make a table summarizing regressions using modelsummary and kable
 
