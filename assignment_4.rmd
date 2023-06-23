@@ -50,31 +50,17 @@ One of the variables in the dataset is `revolutions`, the number of revolutions,
 **Question 2.1**: Using the function `datasummary`, summarize the mean, median, sd, min, and max of the variables `growth`, and `rgdp60` between two groups: countries with `revolutions` equal to 0, and countries with more than 0 revolutions. Call this variable `treat`. Make sure to also write the resulting data set to memory. Hint: you can check some examples [here](https://vincentarelbundock.github.io/modelsummary/articles/datasummary.html#datasummary).
 
 ```{r}
-library(modelsummary); library(tidyverse); library(plyr)
+library(modelsummary); library(tidyverse);
 
 
 Growth_summary <- GrowthSW %>%
             mutate(
                    'treat' = ifelse(revolutions == 0, 0, 1)) 
-
+Growth_summary %>% 
 datasummary(rgdp60 + growth ~ treat * (mean + sd + median + max + min), data = Growth_summary)
 
 ```
-datasummary(growth + rgdp60 ~ treat * (growth_median + growth_sd + growth_min + growth_max + rgdp60_median + rgdp60_sd + rgdp60_min + rgdp60_max),
-                    data = Growth_summary)
-                    
-Growth_summary <- Growth_summary %>%
-  group_by(treat) %>%
 
-    median(growth),
-    sd(growth),
-    min(growth),
-    max(growth),
-    median(rgdp60),
-    sd(rgdp60),
-    min(rgdp60),
-    max(rgdp60)
-)
 
                     
 **Designated place** :Riccardo uses the function datasummary to fulfil the task above. He finds the mean, sd, median, max and min of the dataset Growth_summary. 
@@ -87,7 +73,8 @@ In question 2, we have seen that growth rates differ markedly between countries 
 
 ```{r}
 # write t test here
-
+t_test <- t.test(new_data$growth~new_data$treat)
+print(t_test)
 ```
 
 **Question 3.2**: What is the $p$-value of the test, and what does that mean? Write down your answer below.
@@ -107,14 +94,17 @@ We now want to estimate a stepwise model. Stepwise means that we first estimate 
 **Question 3.4**: Write four models, titled `model1`, `model2`, `model3`, `model4` (using the `lm` function) to memory. Hint: you can also use the `update` function to add variables to an already existing specification.
 
 ```{r}
-
+model1 <- lm(growth ~ treat, data=new_data)
+model2<- update( model1,. ~. + rgdp60)
+model3<- update( model2, .~. + education)
+model4<- update( model3, .~. + tradeshare)
 ```
 
 Now, we put the models in a list, and see what `modelsummary` gives us:
 
 ```{r}
 list(model1, model2, model3, model4) |>
-  modelsummary(stars=T,
+  modelsummary(stars=T,gof_map = c("nobs", "r.squared")
 # edit this to remove the statistics other than R-squared
 # and N
 ) 
@@ -125,19 +115,21 @@ list(model1, model2, model3, model4) |>
 
 **Question 3.6**: According to this analysis, what is the main driver of economic growth? Why?
 
+
 **Question 3.7**: In the code chunk below, edit the table such that the cells (including standard errors) corresponding to the variable `treat` have a red background and white text. Make sure to load the `kableExtra` library beforehand.
 
 ```{r}
 library(kableExtra)
 list(model1, model2, model3, model4) |>
-  modelsummary(stars=T, gof_map = c("nobs", "r.squared")) 
+  modelsummary(stars=T, gof_map = c("nobs", "r.squared")) %>% 
+   row_spec(3:4, background = "blue", color="white")
 # use functions from modelsummary to edit this table
 ```
 
 **Question 3.8**: Write a piece of code that exports this table (without the formatting) to a Word document. 
 
 ```{r}
-
+modelsummary(list(model1,model2,model3,model4),output = "table.docx")
 ```
 
 ## The End
